@@ -1,94 +1,95 @@
-%define gcj_support 1
-%define short_name animation
-%define cvs_version 1_2_0
+%define oname JGoodies
+%define shortoname Animation
 
-Name:           jgoodies-%{short_name}
-Version:        1.2.0
-Release:        %mkrel 0.0.3
-Epoch:          0
-Summary:        Time-based real-time animations in Java
-License:        BSD
-Group:          Development/Java
-URL:            http://www.jgoodies.com/freeware
-Source0:        http://www.jgoodies.com/download/libraries/%{short_name}/%{short_name}-%{cvs_version}.zip
-BuildRequires:  ant
-BuildRequires:  jgoodies-forms
-BuildRequires:  jgoodies-binding
-%if %{gcj_support}
-BuildRequires:  java-gcj-compat-devel
-BuildRequires:  java-1.5.0-gcj-javadoc
-%else
-BuildRequires:  java-devel >= 0:1.4.2
-BuildRequires:  java-javadoc
-BuildArch:      noarch
-%endif
-BuildRequires:  java-rpmbuild
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+%define bname %(echo %oname | tr [:upper:] [:lower:])
+%define shortname %(echo %shortoname | tr [:upper:] [:lower:])
+
+%define version 1.4.3
+%define oversion %(echo %version | tr \. _)
+
+Summary:	Time-based real-time animations in Java
+Name:		%{bname}-%{shortname}
+Version:	%{version}
+Release:	1
+License:	BSD
+Group:		Development/Java
+URL:		http://www.jgoodies.com/freeware/libraries/
+Source0:	http://www.jgoodies.com/download/libraries/%{shortname}/%{name}-%{oversion}.zip
+# NOTE: Latest version of jgoodies libraries can't be freely download from
+#	from the official site. However official maven repo provides some
+#	more updated versions
+# Source0:	https://repo1.maven.org/maven2/com/%{bname}/%{name}/%{version}/%{name}-%{version}-sources.jar
+BuildArch:	noarch
+
+BuildRequires:	java-rpmbuild
+BuildRequires:	maven-local
+BuildRequires:	jgoodies-common >= 1.5
+
+Requires:	java-headless >= 1.6
+Requires:	jpackage-utils
+Requires:	jgoodies-common >= 1.5
 
 %description
 The JGoodies Animation framework enables you to produce sophisticated
-time-based real-time animations in Java. It has been designed for
-a seemless, flexible and powerful integration with Java, ease-of-use
-and a small library size.
+time-based real-time animations in Java. It has been designed for a
+seemless, flexible and powerful integration with Java, ease-of-use and
+a small library size.
+
+The JGoodies Animation requires Java 6 or later.
+
+%files -f .mfiles
+%doc README.html
+%doc RELEASE-NOTES.txt
+%doc LICENSE.txt
+
+#----------------------------------------------------------------------------
 
 %package javadoc
-Summary:        Javadoc for jgoodies-animation
-Group:          Development/Java
+Summary:	Javadoc for %{oname} %{shortoname}
+Requires:	jpackage-utils
 
 %description javadoc
-Javadoc for jgoodies-animation.
+API documentation for %{oname} %{shortoname}.
+
+%files javadoc -f .mfiles-javadoc
+
+#----------------------------------------------------------------------------
 
 %prep
-%setup -q -n %{short_name}-%{version}
-%remove_java_binaries
-%{__rm} -r docs/api
-%{_bindir}/find . -type f -name '*.html' -o -type f -name '*.css' -o -type f -name '*.java' -o -type f -name '*.txt' | \
-  %{_bindir}/xargs -t %{__perl} -pi -e 's/\r$//g'
+%setup -q
+# Extract sources
+mkdir -p src/main/java/
+pushd src/main/java/
+%jar -xf ../../../%{name}-%{version}-sources.jar
+popd
+
+# Extract tests
+mkdir -p src/test/java/
+pushd src/test/java/
+%jar -xf ../../../%{name}-%{version}-tests.jar
+popd
+
+# Delete prebuild JARs and binaries and docs
+find . -name "*.jar" -delete
+find . -name "*.class" -delete
+rm -fr docs
+
+# Fix artifactId
+%pom_xpath_set pom:project/pom:artifactId %{name}
+
+# Add the META-INF/INDEX.LIST to the jar archive (fix jar-not-indexed warning)
+%pom_add_plugin :maven-jar-plugin . "<configuration>
+	<archive>
+		<index>true</index>
+	</archive>
+</configuration>"
+
+# Fix Jar name
+%mvn_file :%{name} %{name}-%{version} %{name}
 
 %build
-export CLASSPATH=$(build-classpath jgoodies-forms jgoodies-binding)
-export OPT_JAR_LIST=:
-%{ant} -Dbuild.sysclasspath=first -Djavadoc.link=%{_javadocdir}/java jar javadoc
+%mvn_build
 
 %install
-%{__rm} -rf %{buildroot}
+%mvn_install
 
-%{__mkdir_p} %{buildroot}%{_javadir}
-%{__cp} -a build/%{short_name}.jar %{buildroot}%{_javadir}/%{name}-%{version}.jar
-%{__ln_s} %{name}-%{version}.jar %{buildroot}%{_javadir}/%{name}.jar
-%{__ln_s} %{name}-%{version}.jar %{buildroot}%{_javadir}/%{short_name}-%{version}.jar
-%{__ln_s} %{short_name}-%{version}.jar %{buildroot}%{_javadir}/%{short_name}.jar
-%{__mkdir_p} %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__cp} -a build/docs/api/* %{buildroot}%{_javadocdir}/%{name}-%{version}
-%{__ln_s} %{name}-%{version} %{buildroot}%{_javadocdir}/%{name}
-
-%if %{gcj_support}
-%{_bindir}/aot-compile-rpm
-%endif
-
-%clean
-%{__rm} -rf %{buildroot}
-
-%if %{gcj_support}
-%post
-%{update_gcjdb}
-
-%postun
-%{clean_gcjdb}
-%endif
-
-%files
-%defattr(0644,root,root,0755)
-%doc RELEASE-NOTES.txt
-%{_javadir}/%{short_name}*.jar
-%{_javadir}/%{name}*.jar
-%if %{gcj_support}
-%dir %{_libdir}/gcj/%{name}
-%attr(-,root,root) %{_libdir}/gcj/%{name}/*.jar.*
-%endif
-
-%files javadoc
-%defattr(0644,root,root,0755)
-%doc RELEASE-NOTES.txt README.html docs/ src/tutorial/ build/classes/tutorial/
-%{_javadocdir}/%{name}-%{version}
-%{_javadocdir}/%{name}
