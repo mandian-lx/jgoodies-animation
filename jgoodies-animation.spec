@@ -23,11 +23,13 @@ BuildArch:	noarch
 
 BuildRequires:	java-rpmbuild
 BuildRequires:	maven-local
-BuildRequires:	jgoodies-common >= 1.5
+BuildRequires:	mvn(com.jgoodies:jgoodies-common)
+# The following is required for tests only
+BuildRequires:	mvn(junit:junit)
 
 Requires:	java-headless >= 1.6
 Requires:	jpackage-utils
-Requires:	jgoodies-common >= 1.5
+Requires:	mvn(com.jgoodies:jgoodies-common)
 
 %description
 The JGoodies Animation framework enables you to produce sophisticated
