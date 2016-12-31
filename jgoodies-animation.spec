@@ -47,7 +47,6 @@ The JGoodies Animation requires Java 6 or later.
 
 %package javadoc
 Summary:	Javadoc for %{oname} %{shortoname}
-Group:		Documentation
 Requires:	jpackage-utils
 
 %description javadoc
