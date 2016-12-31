@@ -21,15 +21,14 @@ Source0:	http://www.jgoodies.com/download/libraries/%{shortname}/%{name}-%{overs
 # Source0:	https://repo1.maven.org/maven2/com/%{bname}/%{name}/%{version}/%{name}-%{version}-sources.jar
 BuildArch:	noarch
 
-BuildRequires:	java-rpmbuild
 BuildRequires:	maven-local
-BuildRequires:	mvn(com.jgoodies:jgoodies-common)
+BuildRequires:	jgoodies-common #mvn(com.jgoodies:jgoodies-common)
 # The following is required for tests only
 BuildRequires:	mvn(junit:junit)
 
 Requires:	java-headless >= 1.6
 Requires:	jpackage-utils
-Requires:	mvn(com.jgoodies:jgoodies-common)
+Requires:	jgoodies-common #mvn(com.jgoodies:jgoodies-common)
 
 %description
 The JGoodies Animation framework enables you to produce sophisticated
@@ -48,6 +47,7 @@ The JGoodies Animation requires Java 6 or later.
 
 %package javadoc
 Summary:	Javadoc for %{oname} %{shortoname}
+Group:		Documentation
 Requires:	jpackage-utils
 
 %description javadoc
@@ -79,7 +79,7 @@ rm -fr docs
 # Fix artifactId
 %pom_xpath_set pom:project/pom:artifactId %{name}
 
-# Add the META-INF/INDEX.LIST to the jar archive (fix jar-not-indexed warning)
+# Fix jar-not-indexed warning
 %pom_add_plugin :maven-jar-plugin . "<configuration>
 	<archive>
 		<index>true</index>
