@@ -23,10 +23,10 @@ Source0:	http://www.jgoodies.com/download/libraries/%{shortname}/%{name}-%{overs
 # Source0:	https://repo1.maven.org/maven2/com/%{bname}/%{name}/%{version}/%{name}-%{version}-sources.jar
 BuildArch:	noarch
 
-BuildRequires:  maven-local
-BuildRequires:  mvn(com.jgoodies:jgoodies-common)
-BuildRequires:  mvn(junit:junit)
-BuildRequires:  mvn(org.sonatype.oss:oss-parent:pom:)
+BuildRequires:	maven-local
+BuildRequires:	mvn(com.jgoodies:jgoodies-common)
+BuildRequires:	mvn(junit:junit)
+BuildRequires:	mvn(org.sonatype.oss:oss-parent:pom:)
 
 %description
 The JGoodies Animation framework enables you to produce sophisticated
