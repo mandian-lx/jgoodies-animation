@@ -1,3 +1,5 @@
+%{?_javapackages_macros:%_javapackages_macros}
+
 %define oname JGoodies
 %define shortoname Animation
 
@@ -21,14 +23,10 @@ Source0:	http://www.jgoodies.com/download/libraries/%{shortname}/%{name}-%{overs
 # Source0:	https://repo1.maven.org/maven2/com/%{bname}/%{name}/%{version}/%{name}-%{version}-sources.jar
 BuildArch:	noarch
 
-BuildRequires:	maven-local
-BuildRequires:	jgoodies-common #mvn(com.jgoodies:jgoodies-common)
-# The following is required for tests only
-BuildRequires:	mvn(junit:junit)
-
-Requires:	java-headless >= 1.6
-Requires:	jpackage-utils
-Requires:	jgoodies-common #mvn(com.jgoodies:jgoodies-common)
+BuildRequires:  maven-local
+BuildRequires:  mvn(com.jgoodies:jgoodies-common)
+BuildRequires:  mvn(junit:junit)
+BuildRequires:  mvn(org.sonatype.oss:oss-parent:pom:)
 
 %description
 The JGoodies Animation framework enables you to produce sophisticated
